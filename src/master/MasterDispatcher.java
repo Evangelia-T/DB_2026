@@ -14,6 +14,7 @@ public class MasterDispatcher {
     private final WorkerRegistry workerRegistry;
     private final WorkerClient workerClient;
     private final ReducerClient reducerClient;
+    private final CasinoState casinoState;
 
     public MasterDispatcher(HashRouter hashRouter,
                             WorkerRegistry workerRegistry,
@@ -23,6 +24,7 @@ public class MasterDispatcher {
         this.workerRegistry = workerRegistry;
         this.workerClient = workerClient;
         this.reducerClient = reducerClient;
+        this.casinoState = new CasinoState();
     }
 
     public Response dispatch(Request request) {
@@ -31,22 +33,18 @@ public class MasterDispatcher {
         }
 
         return switch (request.getType()) {
-            case ADD_GAME -> routeToGameOwner(request);
-            case REMOVE_GAME -> routeByGameName(request.getGameName(), request);
-            case UPDATE_GAME_RISK -> routeByGameName(request.getGameName(), request);
-            case UPDATE_GAME_BET_LIMITS -> routeByGameName(request.getGameName(), request);
-            case GET_PROVIDER_STATS -> reduceFromWorkers(request, RequestType.MAP_PROVIDER_STATS);
-            case GET_PLAYER_STATS -> reduceFromWorkers(request, RequestType.MAP_PLAYER_STATS);
+            case ADD_GAME -> casinoState.addGame(request.getGameInfo());
+            case REMOVE_GAME -> casinoState.removeGame(request.getGameName());
+            case UPDATE_GAME_RISK -> casinoState.updateRisk(request.getGameName(), request.getRiskLevel());
+            case UPDATE_GAME_BET_LIMITS -> casinoState.updateBetLimits(request.getGameName(), request.getMinBet(), request.getMaxBet());
+            case GET_PROVIDER_STATS -> casinoState.providerStats(request.getProviderName());
+            case GET_PLAYER_STATS -> casinoState.playerStats(request.getPlayerId());
+            case SEARCH_GAMES -> casinoState.search(request.getProviderName(), request.getRiskLevel(), request.getBetCategory(), request.getMinStars());
+            case PLACE_BET -> casinoState.placeBet(request.getPlayerId(), request.getGameName(), request.getBetAmount());
+            case ADD_BALANCE -> casinoState.addBalance(request.getPlayerId(), request.getBetAmount());
             case HEALTH_CHECK -> new Response(true, "MASTER_OK");
             default -> new Response(false, "Unsupported request type for master: " + request.getType());
         };
-    }
-
-    private Response routeToGameOwner(Request request) {
-        if (request.getGameInfo() == null || request.getGameInfo().getGameName() == null) {
-            return new Response(false, "Game info or game name is missing");
-        }
-        return routeByGameName(request.getGameInfo().getGameName(), request);
     }
 
     private Response routeByGameName(String gameName, Request request) {
@@ -57,7 +55,6 @@ public class MasterDispatcher {
             return new Response(false, e.getMessage());
         }
     }
-
 
     private Response reduceFromWorkers(Request request, RequestType reduceType) {
         List<Response> mapResponses = workerClient.broadcast(workerRegistry.getWorkers(), request);
