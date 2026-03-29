@@ -33,10 +33,19 @@ public class ManagerConsoleApp {
                         printResponse(send(host, port, Request.updateGameRisk(gameName, scanner.nextLine().trim())));
                     }
                     case "4" -> {
+                        System.out.print("Game name to update bet limits: ");
+                        String gameName = scanner.nextLine().trim();
+                        System.out.print("New min bet: ");
+                        double minBet = Double.parseDouble(scanner.nextLine().trim());
+                        System.out.print("New max bet: ");
+                        double maxBet = Double.parseDouble(scanner.nextLine().trim());
+                        printResponse(send(host, port, Request.updateGameBetLimits(gameName, minBet, maxBet)));
+                    }
+                    case "5" -> {
                         System.out.print("Provider name: ");
                         printResponse(send(host, port, Request.providerStats(scanner.nextLine().trim())));
                     }
-                    case "5" -> {
+                    case "6" -> {
                         System.out.print("Player id: ");
                         printResponse(send(host, port, Request.playerStats(scanner.nextLine().trim())));
                     }
@@ -127,8 +136,9 @@ public class ManagerConsoleApp {
         System.out.println("1. Add game");
         System.out.println("2. Remove game");
         System.out.println("3. Update game risk");
-        System.out.println("4. Provider profit/loss report");
-        System.out.println("5. Player profit/loss report");
+        System.out.println("4. Update game bet limits");
+        System.out.println("5. Provider profit/loss report");
+        System.out.println("6. Player profit/loss report");
         System.out.println("0. Exit");
         System.out.print("Choose option: ");
     }

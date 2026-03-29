@@ -34,6 +34,7 @@ public class MasterDispatcher {
             case ADD_GAME -> routeToGameOwner(request);
             case REMOVE_GAME -> routeByGameName(request.getGameName(), request);
             case UPDATE_GAME_RISK -> routeByGameName(request.getGameName(), request);
+            case UPDATE_GAME_BET_LIMITS -> routeByGameName(request.getGameName(), request);
             case GET_PROVIDER_STATS -> reduceFromWorkers(request, RequestType.MAP_PROVIDER_STATS);
             case GET_PLAYER_STATS -> reduceFromWorkers(request, RequestType.MAP_PLAYER_STATS);
             case HEALTH_CHECK -> new Response(true, "MASTER_OK");
