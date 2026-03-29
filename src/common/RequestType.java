@@ -9,5 +9,8 @@ public enum RequestType {
     GET_PLAYER_STATS,
     MAP_PROVIDER_STATS,
     MAP_PLAYER_STATS,
+    SEARCH_GAMES,
+    PLACE_BET,
+    ADD_BALANCE,
     HEALTH_CHECK
 }
