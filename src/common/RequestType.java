@@ -1,5 +1,12 @@
 package common;
 
 public enum RequestType {
-    ADD_GAME
+    ADD_GAME,
+    REMOVE_GAME,
+    UPDATE_GAME_RISK,
+    GET_PROVIDER_STATS,
+    GET_PLAYER_STATS,
+    MAP_PROVIDER_STATS,
+    MAP_PLAYER_STATS,
+    HEALTH_CHECK
 }
